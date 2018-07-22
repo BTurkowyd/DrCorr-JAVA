@@ -95,9 +95,9 @@ public class SMLMImageReconstruction extends JFrame {
         }
 
         final NumberAxis domainAxis = new NumberAxis("X [nm]");
-        domainAxis.setRange(0, this.maxX);
+        domainAxis.setRange(0, (int) (RescalingFactor.rescalingFactorX*1280*10));
         final NumberAxis rangeAxis = new NumberAxis("Y [nm]");
-        rangeAxis.setRange(0, this.maxY);
+        rangeAxis.setRange(0, (int) (RescalingFactor.rescalingFactorY*1060*10));
 
         final FastScatterPlot plot = new FastScatterPlot(this.afterDrCorr, domainAxis, rangeAxis);
         plot.getRangeAxis().setInverted(true);

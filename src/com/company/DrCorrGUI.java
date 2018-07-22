@@ -107,6 +107,9 @@ class DrCorrGUI implements ActionListener {
         status = new JLabel("Ready to go!");
         status.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
 
+        JLabel copyright = new JLabel("\u00A9 2018 Bartosz Turkowyd, Max Planck Institute für terrestriche Mikrobiologie");
+        copyright.setFont(new Font("Arial", Font.PLAIN, 16));
+
         /*
           Add actions listeners to buttons
          */
@@ -164,6 +167,7 @@ class DrCorrGUI implements ActionListener {
         panel.add(status, new Rectangle(295, 445, 255, 60));
         panel.add(dbScan, new Rectangle(20, 580, 150, 40));
         panel.add(optics, new Rectangle(185, 580, 150, 40));
+        panel.add(copyright, new Rectangle(20, 640, 620, 80));
 
         neNa2.setEnabled(false);
         optics.setEnabled(false);
@@ -350,7 +354,12 @@ class DrCorrGUI implements ActionListener {
 
 
                 try {
-                    ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060)-100);
+                    if (fileType.getSelectedItem() == "RapidStorm") {
+                        ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_RapidStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060)-100);
+                    } else {
+                        ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_ThunderStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060));
+
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
