@@ -1,6 +1,8 @@
 package com.company;
 
 
+import org.jfree.chart.ChartUtilities;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -8,10 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -36,6 +35,7 @@ class DrCorrGUI implements ActionListener {
     private JProgressBar progressBar;
     private JCheckBox nenaCorrTerms;
     static boolean nenaCorrectionTerms = false;
+    SMLMImageReconstruction imageReconstruction = new SMLMImageReconstruction("Image reconstruction");
 
 
     DrCorrGUI() {
@@ -249,6 +249,19 @@ class DrCorrGUI implements ActionListener {
                 this.progressBar.setMaximum(particles.size());
                 status.setText("Data loaded, WOW!");
 
+                imageReconstruction.beforePrint();
+                imageReconstruction.setUndecorated(true);
+                imageReconstruction.pack();
+                imageReconstruction.setVisible(true);
+                imageReconstruction.dispose();
+
+
+                try {
+                    ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\beforeDriftCorr.png"), imageReconstruction.chartBefore, 1280, 1060);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
                 break;
             case "removeROI":
                 if (rois.size() == 0) {
@@ -329,11 +342,20 @@ class DrCorrGUI implements ActionListener {
                     e1.printStackTrace();
                 }
 
+                imageReconstruction.afterPrint();
+                imageReconstruction.setUndecorated(true);
+                imageReconstruction.pack();
+                imageReconstruction.setVisible(true);
+                imageReconstruction.dispose();
 
-//                ImageReconstruction imageReconstruction = new ImageReconstruction(particles);
-//                imageReconstruction.pack();
-//                imageReconstruction.setLocationRelativeTo(null);
-//                imageReconstruction.setVisible(true);
+
+                try {
+                    ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060)-100);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+
 
 
                 particles = new ArrayList<>();
@@ -724,7 +746,7 @@ class DrCorrGUI implements ActionListener {
 }
 
 class RescalingFactor {
-    private static final float WIDTH = 1280, HEIGHT = 1060;
+    static final float WIDTH = 1280, HEIGHT = 1060;
     static float rescalingFactorX, rescalingFactorY;
 
     RescalingFactor(ImageIcon image) {
