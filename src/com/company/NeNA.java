@@ -2,12 +2,23 @@ package com.company;
 
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.exception.ConvergenceException;
 import org.apache.commons.math3.fitting.AbstractCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresBuilder;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
 import org.apache.commons.math3.linear.DiagonalMatrix;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.StatisticalLineAndShapeRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,7 +86,7 @@ class NeNA {
 
     void makeHistograms() {
         double MAXNN = 150;
-        nenaHistogram = new float[(int) MAXNN+1][3];
+        nenaHistogram = new float[(int) MAXNN + 1][3];
         for (int i = 0; i <= MAXNN; i++) {
             nenaHistogram[i][0] = i;
         }
@@ -94,8 +105,8 @@ class NeNA {
             nenaHistogram[i][1] /= counter;
         }
 
-        for (int i=0; i <= MAXNN; i ++){
-            if (nenaHistogram[i][1] > peakValue){
+        for (int i = 0; i <= MAXNN; i++) {
+            if (nenaHistogram[i][1] > peakValue) {
                 peakValue = nenaHistogram[i][1];
                 peakX = nenaHistogram[i][0];
             }
@@ -111,18 +122,55 @@ class NeNA {
             points.add(new WeightedObservedPoint(1.0, nenaHistogram[i][0], nenaHistogram[i][1]));
         }
 
-//        for (WeightedObservedPoint p : points){
-//            System.out.println(p.getWeight() + "   " + p.getX() + "   " + p.getY());
-//        }
-//        System.out.println(points.size());
 
-        final double coefficients[] = fitter.fit(points);
-        System.out.println(Arrays.toString(coefficients));
+        try {
+            final double coefficients[] = fitter.fit(points);
 
-        for (int i = 0; i < MAXNN; i++) {
-            nenaHistogram[i][2] = (float) new NeNAFunc().value(i, coefficients[0], coefficients[1], coefficients[2], coefficients[3], coefficients[4], coefficients[5]);
+            System.out.println(Arrays.toString(coefficients));
+
+            for (int i = 0; i < MAXNN; i++) {
+                nenaHistogram[i][2] = (float) new NeNAFunc().value(i, coefficients[0], coefficients[1], coefficients[2], coefficients[3], coefficients[4], coefficients[5]);
+            }
+            this.NeNAValue = coefficients[0];
+
+            DefaultCategoryDataset nenaRealValues = new DefaultCategoryDataset();
+            DefaultCategoryDataset nenaFitValues = new DefaultCategoryDataset();
+
+            for (int i=0; i < nenaHistogram.length; i++){
+                nenaRealValues.addValue(nenaHistogram[i][1], "nm", String.valueOf(nenaHistogram[i][0]));
+                nenaFitValues.addValue(nenaHistogram[i][2], "nm", String.valueOf(nenaHistogram[i][0]));
+            }
+
+            CategoryPlot nenaPlot = new CategoryPlot();
+
+            CategoryItemRenderer barplot = new BarRenderer();
+            ((BarRenderer) barplot).setShadowVisible(false);
+            CategoryItemRenderer lineplot = new StatisticalLineAndShapeRenderer();
+
+            nenaPlot.setDataset(0, nenaRealValues);
+            nenaPlot.setRenderer(0, barplot);
+
+            nenaPlot.setDataset(1, nenaFitValues);
+            nenaPlot.setRenderer(1, lineplot);
+
+            nenaPlot.setDomainGridlinesVisible(false);
+            nenaPlot.setRangeGridlinesVisible(false);
+            nenaPlot.setDomainAxis(new CategoryAxis("NNdist"));
+            nenaPlot.setRangeAxis(new NumberAxis("PDF"));
+
+            JFreeChart nenaDraw = new JFreeChart(nenaPlot);
+
+            final ChartPanel panel = new ChartPanel(nenaDraw);
+            panel.setPreferredSize(new java.awt.Dimension(1280, 1060));
+
+            JFrame nenaPNG = new JFrame();
+            nenaPNG.setContentPane(panel);
+            nenaPNG.pack();
+            nenaPNG.setVisible(true);
+
+        } catch (ConvergenceException e) {
+            System.out.println("Fit can't be performed");
         }
-        this.NeNAValue = coefficients[0];
     }
 
 

@@ -2,6 +2,7 @@ package com.company;
 
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.exception.ConvergenceException;
 import org.apache.commons.math3.fitting.AbstractCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresBuilder;
@@ -157,13 +158,19 @@ public class NUNeNA extends NeNA {
             points.add(new WeightedObservedPoint(1.0, aNunenaHistogram[0], aNunenaHistogram[1]));
         }
 
-        final double coefficients[] = fitter.fit(points);
-        System.out.println(Arrays.toString(coefficients));
+        try {
+            final double coefficients[] = fitter.fit(points);
+            System.out.println(Arrays.toString(coefficients));
 
-        for (int i = 0; i < nunenaHistogram.length; i++) {
-            nunenaHistogram[i][2] = (float) new NUNeNAFunc().value(nunenaHistogram[i][0], coefficients[0], coefficients[1]);
+            for (int i = 0; i < nunenaHistogram.length; i++) {
+                nunenaHistogram[i][2] = (float) new NUNeNAFunc().value(nunenaHistogram[i][0], coefficients[0], coefficients[1]);
+            }
+            this.NUNeNAvalue = coefficients[0];
+
+        } catch (ConvergenceException e) {
+            System.out.println("Fit can't be performed");
         }
-        this.NUNeNAvalue = coefficients[0];
+
     }
 
 
