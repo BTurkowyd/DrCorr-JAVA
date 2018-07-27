@@ -30,7 +30,7 @@ public class OpticsClustering extends JFrame implements ActionListener {
         panel.setPreferredSize(new Dimension(440, 250));
 
         JTextArea eps = new JTextArea();
-        JLabel epsLabel = new JLabel("Upper threshold limit (nm)");
+        JLabel epsLabel = new JLabel("Upper limit (nm)");
 
         eps.setText("1000");
 

@@ -8,17 +8,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresBuilder;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
 import org.apache.commons.math3.linear.DiagonalMatrix;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.StatisticalLineAndShapeRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -133,40 +123,40 @@ class NeNA {
             }
             this.NeNAValue = coefficients[0];
 
-            DefaultCategoryDataset nenaRealValues = new DefaultCategoryDataset();
-            DefaultCategoryDataset nenaFitValues = new DefaultCategoryDataset();
-
-            for (int i=0; i < nenaHistogram.length; i++){
-                nenaRealValues.addValue(nenaHistogram[i][1], "nm", String.valueOf(nenaHistogram[i][0]));
-                nenaFitValues.addValue(nenaHistogram[i][2], "nm", String.valueOf(nenaHistogram[i][0]));
-            }
-
-            CategoryPlot nenaPlot = new CategoryPlot();
-
-            CategoryItemRenderer barplot = new BarRenderer();
-            ((BarRenderer) barplot).setShadowVisible(false);
-            CategoryItemRenderer lineplot = new StatisticalLineAndShapeRenderer();
-
-            nenaPlot.setDataset(0, nenaRealValues);
-            nenaPlot.setRenderer(0, barplot);
-
-            nenaPlot.setDataset(1, nenaFitValues);
-            nenaPlot.setRenderer(1, lineplot);
-
-            nenaPlot.setDomainGridlinesVisible(false);
-            nenaPlot.setRangeGridlinesVisible(false);
-            nenaPlot.setDomainAxis(new CategoryAxis("NNdist"));
-            nenaPlot.setRangeAxis(new NumberAxis("PDF"));
-
-            JFreeChart nenaDraw = new JFreeChart(nenaPlot);
-
-            final ChartPanel panel = new ChartPanel(nenaDraw);
-            panel.setPreferredSize(new java.awt.Dimension(1280, 1060));
-
-            JFrame nenaPNG = new JFrame();
-            nenaPNG.setContentPane(panel);
-            nenaPNG.pack();
-            nenaPNG.setVisible(true);
+//            DefaultCategoryDataset nenaRealValues = new DefaultCategoryDataset();
+//            DefaultCategoryDataset nenaFitValues = new DefaultCategoryDataset();
+//
+//            for (int i=0; i < nenaHistogram.length; i++){
+//                nenaRealValues.addValue(nenaHistogram[i][1], "nm", String.valueOf(nenaHistogram[i][0]));
+//                nenaFitValues.addValue(nenaHistogram[i][2], "nm", String.valueOf(nenaHistogram[i][0]));
+//            }
+//
+//            CategoryPlot nenaPlot = new CategoryPlot();
+//
+//            CategoryItemRenderer barplot = new BarRenderer();
+//            ((BarRenderer) barplot).setShadowVisible(false);
+//            CategoryItemRenderer lineplot = new StatisticalLineAndShapeRenderer();
+//
+//            nenaPlot.setDataset(0, nenaRealValues);
+//            nenaPlot.setRenderer(0, barplot);
+//
+//            nenaPlot.setDataset(1, nenaFitValues);
+//            nenaPlot.setRenderer(1, lineplot);
+//
+//            nenaPlot.setDomainGridlinesVisible(false);
+//            nenaPlot.setRangeGridlinesVisible(false);
+//            nenaPlot.setDomainAxis(new CategoryAxis("NNdist"));
+//            nenaPlot.setRangeAxis(new NumberAxis("PDF"));
+//
+//            JFreeChart nenaDraw = new JFreeChart(nenaPlot);
+//
+//            final ChartPanel panel = new ChartPanel(nenaDraw);
+//            panel.setPreferredSize(new java.awt.Dimension(1280, 1060));
+//
+//            JFrame nenaPNG = new JFrame();
+//            nenaPNG.setContentPane(panel);
+//            nenaPNG.pack();
+//            nenaPNG.setVisible(true);
 
         } catch (ConvergenceException e) {
             System.out.println("Fit can't be performed");

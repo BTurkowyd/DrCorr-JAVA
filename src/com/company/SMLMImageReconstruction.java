@@ -5,6 +5,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.FastScatterPlot;
 
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -60,6 +61,8 @@ public class SMLMImageReconstruction extends JFrame {
         plot.getRangeAxis().setVisible(false);
         plot.setDomainGridlinesVisible(false);
         plot.setRangeGridlinesVisible(false);
+        plot.setOutlineVisible(false);
+
         plot.setBackgroundPaint(Color.BLACK);
         plot.setPaint(Color.GREEN);
 
@@ -75,10 +78,10 @@ public class SMLMImageReconstruction extends JFrame {
         final ChartPanel panel = new ChartPanel(chartBefore, true);
 
         panel.setPreferredSize(new java.awt.Dimension(1280, 1060));
-        panel.setMinimumDrawHeight(100);
-        panel.setMaximumDrawHeight(2000);
-        panel.setMinimumDrawWidth(100);
-        panel.setMaximumDrawWidth(2000);
+//        panel.setMinimumDrawHeight(100);
+//        panel.setMaximumDrawHeight(2000);
+//        panel.setMinimumDrawWidth(100);
+//        panel.setMaximumDrawWidth(2000);
 
         setContentPane(panel);
 
@@ -86,7 +89,7 @@ public class SMLMImageReconstruction extends JFrame {
 
     public void afterPrint() {
 
-        /** The beforeDrCorr. */
+        /** The afterDrCorr. */
         this.afterDrCorr = new float[2][DrCorrGUI.getParticles().size()];
 
         for (int i=0; i < DrCorrGUI.getParticles().size(); i++) {

@@ -112,27 +112,52 @@ public class TempNeNAFrame extends JFrame implements ActionListener {
                 }
 
                 int countNeNA = 0;
-                for (int i = 0; i < image.subNenaList.size(); i++) {
-                    try (PrintWriter write2 = new PrintWriter(currentDir.getParentFile() + "\\Tempoeral_NeNAs_" + countNeNA + ".txt")) {
-                        write2.println("First frame: " + this.initFrame.getText() + "; last frame: " + this.lastFrame.getText() +
-                                "; increment (frames): " + this.jumpFrame.getText() + "; window size: " + this.windowSize.getText());
-                        for (int j = 0; j < image.subNenaList.get(i).size(); j++) {
-                            write2.println(image.subNenaList.get(i).get(j).NeNAValue);
+                if (!DrCorrGUI.nenaCorrectionTerms){
+                    for (int i = 0; i < image.subNenaList.size(); i++) {
+                        try (PrintWriter write2 = new PrintWriter(currentDir.getParentFile() + "\\Tempoeral_NeNAs_" + countNeNA + ".txt")) {
+                            write2.println("First frame: " + this.initFrame.getText() + "; last frame: " + this.lastFrame.getText() +
+                                    "; increment (frames): " + this.jumpFrame.getText() + "; window size: " + this.windowSize.getText());
+                            for (int j = 0; j < image.subNenaList.get(i).size(); j++) {
+                                write2.println(image.subNenaList.get(i).get(j).NeNAValue);
+                            }
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
                         }
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
-                    }
 
-                    try (PrintWriter write3 = new PrintWriter(currentDir.getParentFile() + "\\Temporal_NeNA_histogram_" + countNeNA + ".txt")) {
-                        write3.println("Localization precision is: " + image.subNenaList.get(i).get(0).NeNAValue + " nm.");
-                        for (int j = 0; j < 150; j++) {
-                            write3.println(image.subNenaList.get(i).get(0).nenaHistogram[j][0] + "\t" + image.subNenaList.get(i).get(0).nenaHistogram[j][1] + "\t" + image.subNenaList.get(i).get(0).nenaHistogram[j][2]);
+                        try (PrintWriter write3 = new PrintWriter(currentDir.getParentFile() + "\\Temporal_NeNA_histogram_" + countNeNA + ".txt")) {
+                            write3.println("Localization precision is: " + image.subNenaList.get(i).get(0).NeNAValue + " nm.");
+                            for (int j = 0; j < 150; j++) {
+                                write3.println(image.subNenaList.get(i).get(0).nenaHistogram[j][0] + "\t" + image.subNenaList.get(i).get(0).nenaHistogram[j][1] + "\t" + image.subNenaList.get(i).get(0).nenaHistogram[j][2]);
+                            }
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
                         }
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
+                        countNeNA++;
                     }
-                    countNeNA++;
+                } else {
+                    for (int i = 0; i < image.subNuNenaList.size(); i++) {
+                        try (PrintWriter write2 = new PrintWriter(currentDir.getParentFile() + "\\Tempoeral_NeNAs_corr_free" + countNeNA + ".txt")) {
+                            write2.println("First frame: " + this.initFrame.getText() + "; last frame: " + this.lastFrame.getText() +
+                                    "; increment (frames): " + this.jumpFrame.getText() + "; window size: " + this.windowSize.getText());
+                            for (int j = 0; j < image.subNuNenaList.get(i).size(); j++) {
+                                write2.println(image.subNuNenaList.get(i).get(j).NUNeNAvalue);
+                            }
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        try (PrintWriter write3 = new PrintWriter(currentDir.getParentFile() + "\\Temporal_NeNA_corr_free_histogram_" + countNeNA + ".txt")) {
+                            write3.println("Localization precision is: " + image.subNuNenaList.get(i).get(0).NUNeNAvalue + " nm.");
+                            for (int j = 0; j < 150; j++) {
+                                write3.println(image.subNuNenaList.get(i).get(0).nunenaHistogram[j][0] + "\t" + image.subNuNenaList.get(i).get(0).nunenaHistogram[j][1] + "\t" + image.subNuNenaList.get(i).get(0).nunenaHistogram[j][2]);
+                            }
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        countNeNA++;
+                    }
                 }
+
 
 
 

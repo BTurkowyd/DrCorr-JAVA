@@ -35,7 +35,7 @@ class DrCorrGUI implements ActionListener {
     private JProgressBar progressBar;
     private JCheckBox nenaCorrTerms;
     static boolean nenaCorrectionTerms = false;
-    SMLMImageReconstruction imageReconstruction = new SMLMImageReconstruction("Image reconstruction");
+    private SMLMImageReconstruction imageReconstruction = new SMLMImageReconstruction("Image reconstruction");
 
 
     DrCorrGUI() {
@@ -107,7 +107,7 @@ class DrCorrGUI implements ActionListener {
         status = new JLabel("Ready to go!");
         status.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
 
-        JLabel copyright = new JLabel("\u00A9 2018 Bartosz Turkowyd, Max Planck Institute für terrestriche Mikrobiologie");
+        JLabel copyright = new JLabel("\u00A9 2018 Bartosz Turkowyd, Max Planck Institut für terrestrische Mikrobiologie");
         copyright.setFont(new Font("Arial", Font.PLAIN, 16));
 
         /*
@@ -170,7 +170,7 @@ class DrCorrGUI implements ActionListener {
         panel.add(copyright, new Rectangle(20, 640, 620, 80));
 
         neNa2.setEnabled(false);
-        optics.setEnabled(false);
+//        optics.setEnabled(false);
 
         /*
          * Creates a menu bar on the top of the root window. Adds the Close7Open image window
@@ -445,7 +445,7 @@ class DrCorrGUI implements ActionListener {
 
                     int countNUNeNA = 0;
                     for (NUNeNA n : image.nunenaList) {
-                        try (PrintWriter write = new PrintWriter(currentDir.getParentFile() + "\\NUNeNA_distances_list_" + countNUNeNA + ".txt")){
+                        try (PrintWriter write = new PrintWriter(currentDir.getParentFile() + "\\NeNA_corr_free_distances_list_" + countNUNeNA + ".txt")){
                             write.println(String.format(Locale.US, "Localization precision (NUNeNA) is: " + "%.2f" + " nm.", n.NUNeNAvalue));
                             for (Particle p : n.subROI) {
                                 if ((p.nnDist != -1) && (p.nn100thDist != -1)) {
@@ -456,7 +456,7 @@ class DrCorrGUI implements ActionListener {
                             e1.printStackTrace();
                         }
 
-                        try (PrintWriter write = new PrintWriter(currentDir.getParentFile() + "\\NUNeNA_histogram_" + countNUNeNA + ".txt")) {
+                        try (PrintWriter write = new PrintWriter(currentDir.getParentFile() + "\\NeNA_corr_free_histogram_" + countNUNeNA + ".txt")) {
                             write.println(String.format(Locale.US, "Localization precision (NUNeNA) is: " + "%.2f" + " nm.", n.NUNeNAvalue));
                             for (int i=0; i < n.nunenaHistogram.length; i++) {
                                 write.println(n.nunenaHistogram[i][0] + "\t" + n.nunenaHistogram[i][1] + "\t" + n.nunenaHistogram[i][2]);
@@ -467,7 +467,7 @@ class DrCorrGUI implements ActionListener {
                         countNUNeNA++;
                     }
 
-                    try (PrintWriter write4 = new PrintWriter((currentDir.getParentFile() + "\\NUNeNA_table.txt"))) {
+                    try (PrintWriter write4 = new PrintWriter((currentDir.getParentFile() + "\\NeNA_corr_free_table.txt"))) {
                         for (int i = 0; i < image.nunenaList.size(); i++) {
                             write4.println(String.format(Locale.US, "%.2f", image.nunenaList.get(i).NUNeNAvalue));
                         }
@@ -755,7 +755,7 @@ class DrCorrGUI implements ActionListener {
 }
 
 class RescalingFactor {
-    static final float WIDTH = 1280, HEIGHT = 1060;
+    private static final float WIDTH = 1280, HEIGHT = 1060;
     static float rescalingFactorX, rescalingFactorY;
 
     RescalingFactor(ImageIcon image) {
