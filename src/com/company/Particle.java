@@ -21,7 +21,8 @@ class Particle {
     int nnDistToHistogram = -1;
     int nn100thDistToHistogram = -1;
     private int dbScanCluster = -1;
-    private int opticsRD = -1;
+    double opticsRD = -1;
+    double opticsCD = -1;
     boolean opticsProcessed = false;
 
 
@@ -97,11 +98,4 @@ class Particle {
         this.dbScanCluster = dbScanCluster;
     }
 
-    int getOpticsRD() {
-        return opticsRD;
-    }
-
-    void setOpticsRD(int opticsRD) {
-        this.opticsRD = opticsRD;
-    }
 }

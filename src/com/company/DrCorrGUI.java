@@ -32,7 +32,7 @@ class DrCorrGUI implements ActionListener {
     private JButton closeImage;
     private JComboBox<String> fileType = new JComboBox<>(new String[]{"RapidStorm", "ThunderStorm"});
     private String fileExtension = ".txt";
-    private JProgressBar progressBar;
+    static JProgressBar progressBar = new JProgressBar();
     private JCheckBox nenaCorrTerms;
     static boolean nenaCorrectionTerms = false;
     private SMLMImageReconstruction imageReconstruction = new SMLMImageReconstruction("Image reconstruction");
@@ -93,7 +93,6 @@ class DrCorrGUI implements ActionListener {
 
         JButton temporalNeNA = new JButton("Temp. NeNA");
         JButton exitButton = new JButton("Exit");
-        this.progressBar = new JProgressBar();
         JButton dbScan = new JButton("DBScan");
         JButton optics = new JButton("OPTICS");
 
@@ -128,7 +127,6 @@ class DrCorrGUI implements ActionListener {
         optics.addActionListener(this);
 
         openImage.setActionCommand("openImage");
-//        importLocFile.setActionCommand("importLocFile");
         removeROI.setActionCommand("removeROI");
         removeAllROIs.setActionCommand("removeAllROIs");
         generateFids.setActionCommand("genFids");
@@ -150,9 +148,8 @@ class DrCorrGUI implements ActionListener {
         /*
          * Places buttons into the root window.
          */
-        panel.setPreferredSize(new Dimension(580, 700));
+        panel.setPreferredSize(new Dimension(580, 800));
         panel.add(openImage, new Rectangle(20, 160, 150, 40));
-//        panel.add(importLocFile, new Rectangle(20, 220, 150, 40));
         panel.add(removeROI, new Rectangle(20, 220, 150, 40));
         panel.add(removeAllROIs, new Rectangle(20, 280, 150, 40));
         panel.add(generateFids, new Rectangle(20, 340, 150, 40));
@@ -167,7 +164,8 @@ class DrCorrGUI implements ActionListener {
         panel.add(status, new Rectangle(295, 445, 255, 60));
         panel.add(dbScan, new Rectangle(20, 580, 150, 40));
         panel.add(optics, new Rectangle(185, 580, 150, 40));
-        panel.add(copyright, new Rectangle(20, 640, 620, 80));
+        panel.add(progressBar, new Rectangle(20, 640, 540,60));
+        panel.add(copyright, new Rectangle(20, 740, 620, 80));
 
         neNa2.setEnabled(false);
 //        optics.setEnabled(false);
@@ -180,6 +178,8 @@ class DrCorrGUI implements ActionListener {
         mb.add(closeImage);
         closeImage.addActionListener(this);
         closeImage.setActionCommand("closeImage");
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
 
         frame.setJMenuBar(mb);
 
@@ -198,73 +198,87 @@ class DrCorrGUI implements ActionListener {
         String action = e.getActionCommand();
         switch (action) {
             case "openImage":
-                openImage();
+                Thread loadData = new Thread(() -> {
+                    openImage();
 
-                rois = image.getRois();
-                roiManager = image;
-                System.out.println("Image is opened");
+                    rois = image.getRois();
+                    roiManager = image;
+                    System.out.println("Image is opened");
 
-
-//                break;
-//            case "importLocFile":
-                particles.clear();
-                openLocFile();
-                System.out.println("Localization file is imported");
-                int counter = 0;
-                for (String ignored : localizationFile) {
-                    counter++;
-                }
-                System.out.println(counter);
-
-                if (fileType.getSelectedItem() == "RapidStorm") {
-                    for (int i = 1; i < counter; i++) {
-                        String[] splitLines = localizationFile.get(i).split(" ");
-                        particles.add(new Particle(Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[1]),
-                                Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3])));
+                    particles.clear();
+                    openLocFile();
+                    System.out.println("Localization file is imported");
+                    int counter = 0;
+                    for (String ignored : localizationFile) {
+                        counter++;
                     }
-                    System.out.println("Number of localizations: " + particles.size());
-                    for (Particle p : particles) {
-                        p.rescale();
+                    System.out.println(counter);
+                    progressBar.setMaximum(counter);
+
+                    if (fileType.getSelectedItem() == "RapidStorm") {
+                        for (int i = 1; i < counter; i++) {
+                            String[] splitLines = localizationFile.get(i).split(" ");
+                            particles.add(new Particle(Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[1]),
+                                    Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3])));
+
+                            progressBar.setValue(i);
+                            progressBar.setString("Loading data: " +  (int) (progressBar.getPercentComplete()*100) + "%");
+                        }
+                        System.out.println("Number of localizations: " + particles.size());
+                        for (Particle p : particles) {
+                            p.rescale();
+                        }
+
+                    } else {
+                        // Improve Particle and ThunderParticle classes, so you don't have to create two arrays.
+                        for (int i = 1; i < counter; i++) {
+                            String[] splitLines = localizationFile.get(i).split(",");
+                            particles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
+                                    Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
+                                    Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
+
+                            thunderParticles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
+                                    Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
+                                    Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
+
+                            progressBar.setValue(i);
+                            progressBar.setString("Loading data: " +  (int) (progressBar.getPercentComplete()*100) + "%");
+                        }
+
+
+                        System.out.println("Number of localizations: " + particles.size());
+                        for (Particle p : particles) {
+                            p.rescale();
+                        }
+
                     }
-                } else {
-                    // Improve Particle and ThunderParticle classes, so you don't have to create two arrays.
-                    for (int i = 1; i < counter; i++) {
-                        String[] splitLines = localizationFile.get(i).split(",");
-                        particles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
-                                Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
-                                Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
 
-                        thunderParticles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
-                                Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
-                                Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
-                    }
-                    System.out.println("Number of localizations: " + particles.size());
-                    for (Particle p : particles) {
-                        p.rescale();
+
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println(particles.get(i).getX() + "--" + particles.get(i).getY() + "--" + particles.get(i).getTime() + "--" + particles.get(i).getIntensity() + "--");
                     }
 
-                }
+                    status.setText("Data loaded, WOW!");
+                    progressBar.setString("Localization file imported!");
+
+                    imageReconstruction.beforePrint();
+                    imageReconstruction.setUndecorated(true);
+                    imageReconstruction.pack();
+                    imageReconstruction.setVisible(true);
+                    imageReconstruction.dispose();
 
 
-                for (int i = 0; i < 10; i++) {
-                    System.out.println(particles.get(i).getX() + "--" + particles.get(i).getY() + "--" + particles.get(i).getTime() + "--" + particles.get(i).getIntensity() + "--");
-                }
-
-                this.progressBar.setMaximum(particles.size());
-                status.setText("Data loaded, WOW!");
-
-                imageReconstruction.beforePrint();
-                imageReconstruction.setUndecorated(true);
-                imageReconstruction.pack();
-                imageReconstruction.setVisible(true);
-                imageReconstruction.dispose();
+                    try {
+                        ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\beforeDriftCorr.png"), imageReconstruction.chartBefore, 1280, 1060);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
 
 
-                try {
-                    ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\beforeDriftCorr.png"), imageReconstruction.chartBefore, 1280, 1060);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+
+                });
+
+                loadData.start();
 
                 break;
             case "removeROI":
@@ -285,92 +299,95 @@ class DrCorrGUI implements ActionListener {
 
                 break;
             case "genFids":
-                float threshold = Float.parseFloat(this.intensityThres.getText());
-                image.generateFiducials(rois, particles, threshold);
-                Particle.loadDrift();
+                Thread driftCorrect = new Thread(() -> {
+                    float threshold = Float.parseFloat(this.intensityThres.getText());
+                    image.generateFiducials(rois, particles, threshold);
+                    Particle.loadDrift();
 
-                int progressCounter = 0;
-                for (Particle p : particles) {
-                    p.driftCorrection();
-                    progressCounter++;
-                    this.progressBar.setValue(progressCounter);
-                    this.progressBar.repaint();
+                    int progressCounter = 0;
+                    for (Particle p : particles) {
+                        p.driftCorrection();
+                        progressCounter++;
+                        progressBar.setValue(progressCounter);
+                        progressBar.setString("Drift correction applied: " +  (int) (progressBar.getPercentComplete()*100) + "%");
+                    }
+                    System.out.println("Drift correction is done!");
+                    progressBar.setString("Drift correction is done!");
 
 
+                    try (PrintWriter writer = new PrintWriter(currentDir.getParentFile() + "\\drift_corrected" + fileExtension)) {
+                        writer.println(localizationFile.get(0));
 
-                }
-                System.out.println("Drift correction is done!");
+                        if (fileType.getSelectedItem() == "RapidStorm") {
+                            for (Particle p : particles) {
+                                writer.println(String.format(Locale.US, "%.1f %.1f %.0f %.0f", p.getNewX(), p.getNewY(), p.getTime(), p.getIntensity()));
+                            }
+                        } else {
+                            for (int i = 0; i < thunderParticles.size(); i++) {
+                                writer.println(thunderParticles.get(i).getId() + "," + thunderParticles.get(i).getTime() + "," + particles.get(i).getNewX() + "," + particles.get(i).getNewY() + "," +
+                                        thunderParticles.get(i).getSigma() + "," + thunderParticles.get(i).getIntensity() + "," + thunderParticles.get(i).getOffset() + "," +
+                                        thunderParticles.get(i).getBkgstd() + "," + thunderParticles.get(i).getChi2() + "," + thunderParticles.get(i).getUncertainity_xy());
+                            }
 
-
-                try (PrintWriter writer = new PrintWriter(currentDir.getParentFile() + "\\drift_corrected" + fileExtension)) {
-                    writer.println(localizationFile.get(0));
-
-                    if (fileType.getSelectedItem() == "RapidStorm") {
-                        for (Particle p : particles) {
-                            writer.println(String.format(Locale.US, "%.1f %.1f %.0f %.0f", p.getNewX(), p.getNewY(), p.getTime(), p.getIntensity()));
                         }
-                    } else {
-                        for (int i = 0; i < thunderParticles.size(); i++) {
-                            writer.println(thunderParticles.get(i).getId() + "," + thunderParticles.get(i).getTime() + "," + particles.get(i).getNewX() + "," + particles.get(i).getNewY() + "," +
-                                    thunderParticles.get(i).getSigma() + "," + thunderParticles.get(i).getIntensity() + "," + thunderParticles.get(i).getOffset() + "," +
-                                    thunderParticles.get(i).getBkgstd() + "," + thunderParticles.get(i).getChi2() + "," + thunderParticles.get(i).getUncertainity_xy());
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                    }
+
+
+                    try (PrintWriter writer = new PrintWriter(currentDir.getParentFile() + "\\drift_trace.txt")) {
+                        writer.println("x [nm]\ty [nm]");
+                        for (int i=0; i < ROIManager.getSmoothDrift().length; i++){
+                            writer.println(String.format(Locale.US, "%.2f\t%.2f", ROIManager.getSmoothDrift()[i][0], ROIManager.getSmoothDrift()[i][1]));
                         }
-
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
                     }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                }
 
-
-                try (PrintWriter writer = new PrintWriter(currentDir.getParentFile() + "\\drift_trace.txt")) {
-                    writer.println("x [nm]\ty [nm]");
-                    for (int i=0; i < ROIManager.getSmoothDrift().length; i++){
-                        writer.println(String.format(Locale.US, "%.2f\t%.2f", ROIManager.getSmoothDrift()[i][0], ROIManager.getSmoothDrift()[i][1]));
+                    BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+                    Graphics g = bufferedImage.getGraphics();
+                    g.drawImage(rescaledImage,0,0, null);
+                    g.setColor(Color.MAGENTA);
+                    g.setFont(new Font("Arial", Font.BOLD, 20));
+                    for (int i=0; i < rois.size(); i++){
+                        g.drawString(Integer.toString(i+1), (int) rois.get(i).x + 2, (int) rois.get(i).y + 20);
+                        g.drawRect((int) rois.get(i).x, (int) rois.get(i).y, (int) (rois.get(i).x2 - rois.get(i).x), (int) (rois.get(i).y2 - rois.get(i).y));
                     }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                }
-
-                BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-                Graphics g = bufferedImage.getGraphics();
-                g.drawImage(rescaledImage,0,0, null);
-                g.setColor(Color.MAGENTA);
-                g.setFont(new Font("Arial", Font.BOLD, 20));
-                for (int i=0; i < rois.size(); i++){
-                    g.drawString(Integer.toString(i+1), (int) rois.get(i).x + 2, (int) rois.get(i).y + 20);
-                    g.drawRect((int) rois.get(i).x, (int) rois.get(i).y, (int) (rois.get(i).x2 - rois.get(i).x), (int) (rois.get(i).y2 - rois.get(i).y));
-                }
-                try {
-                    ImageIO.write(bufferedImage, "png", new File(currentDir.getParentFile() + "\\Selected_fiducials.png"));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                imageReconstruction.afterPrint();
-                imageReconstruction.setUndecorated(true);
-                imageReconstruction.pack();
-                imageReconstruction.setVisible(true);
-                imageReconstruction.dispose();
-
-
-                try {
-                    if (fileType.getSelectedItem() == "RapidStorm") {
-                        ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_RapidStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060)-100);
-                    } else {
-                        ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_ThunderStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060));
-
+                    try {
+                        ImageIO.write(bufferedImage, "png", new File(currentDir.getParentFile() + "\\Selected_fiducials.png"));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+
+                    imageReconstruction.afterPrint();
+                    imageReconstruction.setUndecorated(true);
+                    imageReconstruction.pack();
+                    imageReconstruction.setVisible(true);
+                    imageReconstruction.dispose();
+
+
+                    try {
+                        if (fileType.getSelectedItem() == "RapidStorm") {
+                            ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_RapidStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060)-100);
+                        } else {
+                            ChartUtilities.saveChartAsPNG(new File(currentDir.getParentFile() + "\\afterDriftCorr_ThunderStorm.png"), imageReconstruction.chartAfter, (int) (RescalingFactor.rescalingFactorX*1280), (int) (RescalingFactor.rescalingFactorY*1060));
+
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
 
 
 
 
-                particles = new ArrayList<>();
-                image.setVisible(false);
+                    particles = new ArrayList<>();
+                    image.setVisible(false);
 
-                status.setText("Drift, so much!");
+                    status.setText("Drift, so much!");
+
+                });
+
+                driftCorrect.start();
 
                 break;
             case "nenacorrterms":
@@ -448,8 +465,8 @@ class DrCorrGUI implements ActionListener {
                         try (PrintWriter write = new PrintWriter(currentDir.getParentFile() + "\\NeNA_corr_free_distances_list_" + countNUNeNA + ".txt")){
                             write.println(String.format(Locale.US, "Localization precision (NUNeNA) is: " + "%.2f" + " nm.", n.NUNeNAvalue));
                             for (Particle p : n.subROI) {
-                                if ((p.nnDist != -1) && (p.nn100thDist != -1)) {
-                                    write.println(p.nnDist + " " + p.nn100thDist + "\t");
+                                if (p.nnDist != -1){
+                                    write.println(p.nnDist +"\t");
                                 }
                             }
                         } catch (FileNotFoundException e1) {
@@ -556,8 +573,7 @@ class DrCorrGUI implements ActionListener {
 
                 break;
             case "optics":
-                System.out.println("Not yet");
-                new OpticsClustering(particles, rois, currentDir, fileType);
+                new OpticsClustering();
 
                 break;
             case "exitButton":
