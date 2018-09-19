@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DrCorrJava2:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DrCorrJava2_jar</output-path>
+    <root id="archive" name="DrCorrJava2.jar">
+      <element id="module-output" name="DrCorrJava2" />
+      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/commons-math3-3.6.1/commons-math3-3.6.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="D:/Downloads/jfreechart-1.0.19/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="D:/Downloads/jfreechart-1.0.19/jfreechart-1.0.19/lib/jcommon-1.0.23.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
