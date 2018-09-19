@@ -32,7 +32,7 @@ class DrCorrGUI implements ActionListener {
     private JButton closeImage;
     private JComboBox<String> fileType = new JComboBox<>(new String[]{"RapidStorm", "ThunderStorm"});
     private String fileExtension = ".txt";
-    static JProgressBar progressBar = new JProgressBar();
+    private static JProgressBar progressBar = new JProgressBar();
     private JCheckBox nenaCorrTerms;
     static boolean nenaCorrectionTerms = false;
     private SMLMImageReconstruction imageReconstruction = new SMLMImageReconstruction("Image reconstruction");
