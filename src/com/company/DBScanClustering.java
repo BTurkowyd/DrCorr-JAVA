@@ -19,7 +19,6 @@ import java.util.Locale;
 public class DBScanClustering extends JFrame implements ActionListener {
 
     private List<Particle> particles;
-    private List<ThunderParticle> thunderParticles;
     private List<ROIManager.ROIs> rois;
     private File currentDir;
     private ArrayList<List<Particle>> subRois = new ArrayList<>();
@@ -100,7 +99,6 @@ public class DBScanClustering extends JFrame implements ActionListener {
             case "dbscan":
                 Thread runDBScan = new Thread(() -> {
                     this.particles = DrCorrGUI.getParticles();
-                    this.thunderParticles = DrCorrGUI.getThunderParticles();
                     this.rois = DrCorrGUI.getRois();
                     this.currentDir = DrCorrGUI.getCurrentDir();
 
@@ -206,12 +204,12 @@ public class DBScanClustering extends JFrame implements ActionListener {
                         }
                     } else {
                         try (PrintWriter writer = new PrintWriter(currentDir.getParentFile() + "\\DBScan_clusters.csv")) {
-                            for (int i=0; i < particles.size(); i++) {
-                                if (particles.get(i).getDbScanCluster() > -2) {
+                            for (Particle particle : particles) {
+                                if (particle.getDbScanCluster() > -2) {
                                     writer.println(String.format(Locale.US, "%.0f,%.0f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.0f",
-                                            thunderParticles.get(i).getId(), thunderParticles.get(i).getTime(), thunderParticles.get(i).getX(), thunderParticles.get(i).getY(),
-                                            thunderParticles.get(i).getSigma(), thunderParticles.get(i).getIntensity(), thunderParticles.get(i).getOffset(), thunderParticles.get(i).getBkgstd(),
-                                            thunderParticles.get(i).getChi2(), thunderParticles.get(i).getUncertainity_xy(), (float) particles.get(i).getDbScanCluster()));
+                                            particle.getId(), particle.getTime(), particle.getX(), particle.getY(),
+                                            particle.getSigma(), particle.getIntensity(), particle.getOffset(), particle.getBkgstd(),
+                                            particle.getChi2(), particle.getUncertainity_xy(), (float) particle.getDbScanCluster()));
                                 }
 
                             }

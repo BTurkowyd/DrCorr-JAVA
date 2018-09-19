@@ -8,6 +8,12 @@ class Particle {
     private final float y;
     private float time;
     private float intensity;
+    private float id;
+    private float sigma;
+    private float offset;
+    private float bkgstd;
+    private float chi2;
+    private float uncertainity_xy;
     private float rescaledX;
     private float rescaledY;
     private float newX, newY;
@@ -32,6 +38,20 @@ class Particle {
         this.time = time;
         this.intensity = intensity;
 
+
+    }
+
+    Particle(float x, float y, float time, float intensity, float id, float sigma, float offset, float bkgstd, float chi2, float uncertainity_xy) {
+        this.x = x;
+        this.y = y;
+        this.time = time;
+        this.intensity = intensity;
+        this.id = id;
+        this.sigma = sigma;
+        this.offset = offset;
+        this.bkgstd = bkgstd;
+        this.chi2 = chi2;
+        this.uncertainity_xy = uncertainity_xy;
 
     }
 
@@ -88,6 +108,30 @@ class Particle {
 
     float getNewY() {
         return newY;
+    }
+
+    float getId() {
+        return id;
+    }
+
+    float getSigma() {
+        return sigma;
+    }
+
+    float getOffset() {
+        return offset;
+    }
+
+    float getBkgstd() {
+        return bkgstd;
+    }
+
+    float getChi2() {
+        return chi2;
+    }
+
+    float getUncertainity_xy() {
+        return uncertainity_xy;
     }
 
     int getDbScanCluster() {

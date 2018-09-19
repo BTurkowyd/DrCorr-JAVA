@@ -19,7 +19,6 @@ import java.util.List;
 class DrCorrGUI implements ActionListener {
 
     private static List<Particle> particles = new ArrayList<>();
-    private static List<ThunderParticle> thunderParticles = new ArrayList<>();
     private static List<ROIManager.ROIs> rois;
     private static ROIManager roiManager;
     private JFileChooser file;
@@ -43,10 +42,6 @@ class DrCorrGUI implements ActionListener {
 
     static List<Particle> getParticles() {
         return particles;
-    }
-
-    static List<ThunderParticle> getThunderParticles() {
-        return thunderParticles;
     }
 
     static List<ROIManager.ROIs> getRois() {
@@ -233,11 +228,7 @@ class DrCorrGUI implements ActionListener {
                         // Improve Particle and ThunderParticle classes, so you don't have to create two arrays.
                         for (int i = 1; i < counter; i++) {
                             String[] splitLines = localizationFile.get(i).split(",");
-                            particles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
-                                    Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
-                                    Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
-
-                            thunderParticles.add(new ThunderParticle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
+                            particles.add(new Particle(Float.parseFloat(splitLines[2]), Float.parseFloat(splitLines[3]),
                                     Float.parseFloat(splitLines[1]), Float.parseFloat(splitLines[5]), Float.parseFloat(splitLines[0]), Float.parseFloat(splitLines[4]),
                                     Float.parseFloat(splitLines[6]), Float.parseFloat(splitLines[7]), Float.parseFloat(splitLines[8]), Float.parseFloat(splitLines[9])));
 
@@ -323,10 +314,10 @@ class DrCorrGUI implements ActionListener {
                                 writer.println(String.format(Locale.US, "%.1f %.1f %.0f %.0f", p.getNewX(), p.getNewY(), p.getTime(), p.getIntensity()));
                             }
                         } else {
-                            for (int i = 0; i < thunderParticles.size(); i++) {
-                                writer.println(thunderParticles.get(i).getId() + "," + thunderParticles.get(i).getTime() + "," + particles.get(i).getNewX() + "," + particles.get(i).getNewY() + "," +
-                                        thunderParticles.get(i).getSigma() + "," + thunderParticles.get(i).getIntensity() + "," + thunderParticles.get(i).getOffset() + "," +
-                                        thunderParticles.get(i).getBkgstd() + "," + thunderParticles.get(i).getChi2() + "," + thunderParticles.get(i).getUncertainity_xy());
+                            for (Particle particle : particles) {
+                                writer.println(particle.getId() + "," + particle.getTime() + "," + particle.getNewX() + "," + particle.getNewY() + "," +
+                                        particle.getSigma() + "," + particle.getIntensity() + "," + particle.getOffset() + "," +
+                                        particle.getBkgstd() + "," + particle.getChi2() + "," + particle.getUncertainity_xy());
                             }
 
                         }

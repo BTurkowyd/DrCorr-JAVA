@@ -13,12 +13,10 @@ import java.util.List;
 public class OpticsClustering extends JFrame implements ActionListener {
 
     private List<Particle> particles;
-    private List<ROIManager.ROIs> rois;
     private int minPoints;
     private double maxRadius;
     private File currentDir;
     private JComboBox<String> fileType;
-    private List<ThunderParticle> thunderParticles;
     private ArrayList<List<Particle>> subRois = new ArrayList<>();
     private ArrayList<List<Particle>> unprocessed = new ArrayList<>();
     private ArrayList<List<Particle>> ordered = new ArrayList<>();
@@ -80,24 +78,22 @@ public class OpticsClustering extends JFrame implements ActionListener {
         System.out.println("OPTICS area populated");
     }
 
-    double getHypotenuse(Particle particleOfInterest, Particle otherParticles) {
+    private double getHypotenuse(Particle particleOfInterest, Particle otherParticles) {
         return Math.hypot(particleOfInterest.getX() - otherParticles.getX(),
                 particleOfInterest.getY() - otherParticles.getY());
 
     }
 
-    void setup(List<Particle> subRoi){
+    private void setup(List<Particle> subRoi){
         System.out.println("Size of the subRoi: " + subRoi.size());
         List<Particle> unprocessedRoi = new ArrayList<>();
         List<Particle> orderedRoi = new ArrayList<>();
-        for (Particle p : subRoi){
-            unprocessedRoi.add(p);
-        }
+        unprocessedRoi.addAll(subRoi);
         this.unprocessed.add(unprocessedRoi);
         this.ordered.add(orderedRoi);
     }
 
-    double coreDistance(Particle point, List<Particle> neighbors){
+    private double coreDistance(Particle point, List<Particle> neighbors){
         if (point.opticsCD != -1) {
             return point.opticsCD;
         }
@@ -120,7 +116,7 @@ public class OpticsClustering extends JFrame implements ActionListener {
         return point.opticsCD;
     }
 
-    List<Particle> neighbors(Particle point, List<Particle> subRoi){
+    private List<Particle> neighbors(Particle point, List<Particle> subRoi){
         List<Particle> pointNeighbors = new ArrayList<>();
         for (Particle p : subRoi){
             if (getHypotenuse(point, p) <= this.maxRadius && point != p) {
@@ -131,13 +127,13 @@ public class OpticsClustering extends JFrame implements ActionListener {
         return pointNeighbors;
     }
 
-    void processed(Particle point, List<Particle> unprocessed, List<Particle> ordered){
+    private void processed(Particle point, List<Particle> unprocessed, List<Particle> ordered){
         point.opticsProcessed = true;
         unprocessed.remove(point);
         ordered.add(point);
     }
 
-    void update(List<Particle> neighbors, Particle point, List<Particle> seeds){
+    private void update(List<Particle> neighbors, Particle point, List<Particle> seeds){
         for (Particle n : neighbors){
             if(!n.opticsProcessed){
                 double newRD = Math.max(point.opticsCD, getHypotenuse(point, n));
@@ -152,7 +148,7 @@ public class OpticsClustering extends JFrame implements ActionListener {
 
     }
 
-    void run(){
+    private void run(){
         for (int i= 0; i < this.subRois.size(); i++){
 
             setup(this.subRois.get(i));
@@ -197,7 +193,7 @@ public class OpticsClustering extends JFrame implements ActionListener {
                                     }
                                 }
 
-                                catch (IndexOutOfBoundsException e) {
+                                catch (IndexOutOfBoundsException ignored) {
                                 }
 
                                 opticsProgress.setValue(this.ordered.get(i).size());
@@ -238,8 +234,7 @@ public class OpticsClustering extends JFrame implements ActionListener {
 
 
                 this.particles = DrCorrGUI.getParticles();
-                this.thunderParticles = DrCorrGUI.getThunderParticles();
-                this.rois = DrCorrGUI.getRois();
+                List<ROIManager.ROIs> rois = DrCorrGUI.getRois();
                 this.currentDir = DrCorrGUI.getCurrentDir();
 
                 this.subRois.clear();
@@ -252,11 +247,9 @@ public class OpticsClustering extends JFrame implements ActionListener {
                     p.opticsProcessed = false;
                 }
 
-                if (this.rois.size() == 0) {
+                if (rois.size() == 0) {
                     ArrayList<Particle> subListOfParticles = new ArrayList<>();
-                    for (Particle p : particles) {
-                        subListOfParticles.add(p);
-                    }
+                    subListOfParticles.addAll(particles);
                     this.subRois.add(subListOfParticles);
                     System.out.println("No ROIs selected, all localizations are taken to the analysis\n");
                     System.out.println("Number of events " + this.subRois.get(0).size());
