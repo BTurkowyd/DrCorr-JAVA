@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 
-public class OpticsClustering extends JFrame implements ActionListener {
+public class OpticsClustering extends JFrame implements ActionListener{
 
     private List<Particle> particles;
     private int minPoints;

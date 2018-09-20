@@ -278,6 +278,8 @@ class DrCorrGUI implements ActionListener {
                 } else {
                     rois.remove(rois.size() - 1);
                     roiManager.rectangles.remove(roiManager.rectangles.size() - 1);
+                    image.setVisible(false);
+                    image.setVisible(true);
                     System.out.println("ROI removed");
                 }
 
@@ -285,6 +287,8 @@ class DrCorrGUI implements ActionListener {
             case "removeAllROIs":
                 rois.clear();
                 roiManager.rectangles.clear();
+                image.setVisible(false);
+                image.setVisible(true);
                 System.out.println("All ROIs are removed. You can start again. ");
 
 

@@ -30,7 +30,6 @@ class ROIManager extends JFrame {
         addMouseListener(listener);
         addMouseMotionListener(listener);
 
-
         this.setSize(img.getIconWidth(), img.getIconHeight());
         this.setTitle("Super-resolution reconstruction image");
         this.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
@@ -63,9 +62,11 @@ class ROIManager extends JFrame {
         int ph = Math.abs(y - y2);
         g.drawRect(px, py, pw, ph);
         for (Rectangle r : rectangles) {
+            g.setColor(Color.RED);
             g.drawRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
 
         }
+        g.dispose();
     }
 
     List<ROIs> getRois() {
