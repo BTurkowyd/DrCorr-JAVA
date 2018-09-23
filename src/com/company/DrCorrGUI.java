@@ -91,7 +91,7 @@ class DrCorrGUI implements ActionListener {
         JButton dbScan = new JButton("DBScan");
         JButton optics = new JButton("OPTICS");
 
-        JLabel threshold = new JLabel("<-  Fiducial intensity (only drift)");
+        JLabel threshold = new JLabel("Fiducial intensity (only drift)");
         this.intensityThres = new JTextArea();
         intensityThres.setFont(new Font("Arial", Font.PLAIN, 20));
         intensityThres.setText("10000");
@@ -144,22 +144,22 @@ class DrCorrGUI implements ActionListener {
          * Places buttons into the root window.
          */
         panel.setPreferredSize(new Dimension(580, 800));
-        panel.add(openImage, new Rectangle(20, 160, 150, 40));
-        panel.add(removeROI, new Rectangle(20, 220, 150, 40));
-        panel.add(removeAllROIs, new Rectangle(20, 280, 150, 40));
-        panel.add(generateFids, new Rectangle(20, 340, 150, 40));
-        panel.add(nenaCorrTerms, new Rectangle(20, 410, 300, 40));
-        panel.add(nena, new Rectangle(20, 460, 150, 40));
-        panel.add(neNa2, new Rectangle(20, 520, 150, 40));
-        panel.add(temporalNeNA, new Rectangle(185, 520,150,40));
+        panel.add(openImage, new Rectangle(20, 220, 150, 40));
+        panel.add(removeROI, new Rectangle(20, 280, 150, 40));
+        panel.add(removeAllROIs, new Rectangle(20, 340, 150, 40));
+        panel.add(generateFids, new Rectangle(20, 400, 150, 40));
+        panel.add(nenaCorrTerms, new Rectangle(20, 470, 300, 40));
+        panel.add(nena, new Rectangle(20, 520, 150, 40));
+        panel.add(neNa2, new Rectangle(20, 580, 150, 40));
+        panel.add(temporalNeNA, new Rectangle(185, 580,150,40));
         panel.add(fileType, new Rectangle(20, 40, 180, 40));
-        panel.add(exitButton, new Rectangle(350, 520, 150, 40));
-        panel.add(threshold, new Rectangle(200, 100, 300, 40));
-        panel.add(intensityThres, new Rectangle(20, 100, 150, 40));
-        panel.add(status, new Rectangle(295, 445, 255, 60));
-        panel.add(dbScan, new Rectangle(20, 580, 150, 40));
-        panel.add(optics, new Rectangle(185, 580, 150, 40));
-        panel.add(progressBar, new Rectangle(20, 640, 540,60));
+        panel.add(exitButton, new Rectangle(350, 640, 150, 40));
+        panel.add(threshold, new Rectangle(20, 110, 300, 40));
+        panel.add(intensityThres, new Rectangle(20, 160, 150, 40));
+        panel.add(status, new Rectangle(295, 505, 255, 60));
+        panel.add(dbScan, new Rectangle(20, 640, 150, 40));
+        panel.add(optics, new Rectangle(185, 640, 150, 40));
+        panel.add(progressBar, new Rectangle(20, 700, 540,60));
         panel.add(copyright, new Rectangle(20, 740, 620, 80));
 
         neNa2.setEnabled(false);

@@ -208,9 +208,13 @@ public class OpticsClustering extends JFrame implements ActionListener{
                     opticsProgress.setString("Done!");
                     DrCorrGUI.status.setText("OPTICS, so slow");
 
+                    cluster(15);
+
                     try(PrintWriter write = new PrintWriter((this.currentDir.getParentFile() + "\\OPTICS_plot_" + i + ".txt"))){
                         for (int j = 0; j < this.ordered.get(i).size(); j++){
-                            write.println(String.format(Locale.US, "%.2f", this.ordered.get(i).get(j).opticsRD));
+                            write.println(String.format(Locale.US, "%.1f %.1f %.2f %.0f", this.ordered.get(i).get(j).getX(),
+                                    this.ordered.get(i).get(j).getY(), this.ordered.get(i).get(j).opticsRD,
+                                    (float) this.ordered.get(i).get(j).opticsCluster));
                         }
                     } catch (FileNotFoundException e1){
                         e1.printStackTrace();
@@ -221,6 +225,37 @@ public class OpticsClustering extends JFrame implements ActionListener{
 
             runOptics.start();
 
+
+    }
+
+    private void cluster(float upperThres){
+        for (int i= 0; i < this.subRois.size(); i++){
+            List<Integer> separators = new ArrayList<>();
+
+            for(int j=0; j < this.ordered.get(i).size(); j++){
+                int this_j = j;
+                Particle thisPoint = this.ordered.get(i).get(j);
+                double thisRD = thisPoint.opticsRD;
+
+                if ((thisRD > upperThres) || (thisRD == -1)){
+                    separators.add(this_j);
+                }
+            }
+
+            int clusterIdent = 1;
+            for (int j=0; j < separators.size()-1; j++){
+                int start = separators.get(j);
+                int end = separators.get(j+1);
+
+                if ((end-start) > this.minPoints){
+                    for (int k = start; k <= end; k++){
+                        this.ordered.get(i).get(k).opticsCluster = clusterIdent;
+                    }
+                    clusterIdent++;
+                }
+
+            }
+        }
 
     }
 

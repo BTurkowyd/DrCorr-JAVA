@@ -29,6 +29,7 @@ class Particle {
     private int dbScanCluster = -1;
     double opticsRD = -1;
     double opticsCD = -1;
+    int opticsCluster = -1;
     boolean opticsProcessed = false;
 
 
