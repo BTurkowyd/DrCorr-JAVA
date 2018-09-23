@@ -23,6 +23,8 @@ public class OpticsClustering extends JFrame implements ActionListener{
     private JTextArea eps = new JTextArea();
     private JTextArea minPts = new JTextArea();
     private static JProgressBar opticsProgress = new JProgressBar();
+    JButton executeOPTICS;
+    OpticsThread runOptics;
 
     OpticsClustering() throws HeadlessException {
 
@@ -47,7 +49,8 @@ public class OpticsClustering extends JFrame implements ActionListener{
         opticsProgress.setStringPainted(true);
         opticsProgress.setString("Progress: " + (int) (opticsProgress.getPercentComplete()*100) + "%");
 
-        JButton executeOPTICS = new JButton("Run OPTICS");
+
+        executeOPTICS = new JButton("Run OPTICS");
 
         executeOPTICS.addActionListener(this);
         executeOPTICS.setActionCommand("optics");
@@ -158,73 +161,80 @@ public class OpticsClustering extends JFrame implements ActionListener{
             System.out.println("Size of the subRoi array: " + this.subRois.get(i).size());
             }
 
-            Thread runOptics = new Thread(() -> {
-                for (int i= 0; i < this.unprocessed.size(); i++){
-                    opticsProgress.setMaximum(this.unprocessed.get(i).size());
-                    int counts = 0;
-                    while(this.unprocessed.get(i).size() > 0){
-                        Particle point = this.unprocessed.get(i).get(0);
-                        processed(point, this.unprocessed.get(i), this.ordered.get(i));
-
-                        List<Particle> pointNeighbors = neighbors(point, this.subRois.get(i));
-
-                        if (pointNeighbors.size() > 0) {
-//                    System.out.println("Neighbor size. " + pointNeighbors.size());
-                            counts += pointNeighbors.size();
-                        }
+            runOptics = new OpticsThread();
 
 
+//        runOptics = new Thread(() -> {
+//
+//            executeOPTICS.setText("Stop OPTICS");
+//            executeOPTICS.setActionCommand("killOptics");
+//            for (int i= 0; i < this.unprocessed.size(); i++){
+//                opticsProgress.setMaximum(this.unprocessed.get(i).size());
+//                int counts = 0;
+//                while(this.unprocessed.get(i).size() > 0){
+//                    Particle point = this.unprocessed.get(i).get(0);
+//                    processed(point, this.unprocessed.get(i), this.ordered.get(i));
+//
+//                    List<Particle> pointNeighbors = neighbors(point, this.subRois.get(i));
+//
+//                    if (pointNeighbors.size() > 0) {
+////                    System.out.println("Neighbor size. " + pointNeighbors.size());
+//                        counts += pointNeighbors.size();
+//                    }
+//
+//
+//                    if (coreDistance(point, pointNeighbors) > 0){
+//                        List<Particle> seeds = new ArrayList<>();
+//                        update(pointNeighbors, point, seeds);
+//
+//                        while(seeds.size() > 0) {
+//                            Collections.sort(seeds, new RDComparator());
+//                            try{
+//                                Particle n = seeds.get(0);
+//                                seeds.remove(0);
+//
+//                                processed(n, this.unprocessed.get(i), this.ordered.get(i));
+//                                List<Particle> nNeighbors = neighbors(n, this.subRois.get(i));
+//
+//                                if (coreDistance(n, nNeighbors) > 0){
+//                                    update(nNeighbors, n, seeds);
+//                                }
+//                            }
+//
+//                            catch (IndexOutOfBoundsException ignored) {
+//                            }
+//
+//                            opticsProgress.setValue(this.ordered.get(i).size());
+//                            opticsProgress.setString("Processing ROI " + (i+1) + ": " + (int) (opticsProgress.getPercentComplete()*100) + "%");
+//                            opticsProgress.repaint();
+//                        }
+//
+//                    }
+//
+////
+//                }
+//                System.out.println("Counts: " + counts);
+//                opticsProgress.setString("Done!");
+//                DrCorrGUI.status.setText("OPTICS, so slow");
+//
+//                cluster(15);
+//
+//                try(PrintWriter write = new PrintWriter((this.currentDir.getParentFile() + "\\OPTICS_plot_" + i + ".txt"))){
+//                    for (int j = 0; j < this.ordered.get(i).size(); j++){
+//                        write.println(String.format(Locale.US, "%.1f %.1f %.2f %.0f", this.ordered.get(i).get(j).getX(),
+//                                this.ordered.get(i).get(j).getY(), this.ordered.get(i).get(j).opticsRD,
+//                                (float) this.ordered.get(i).get(j).opticsCluster));
+//                    }
+//                } catch (FileNotFoundException e1){
+//                    e1.printStackTrace();
+//                }
+//
+//            }
+//            executeOPTICS.setText("Run OPTICS");
+//            executeOPTICS.setActionCommand("optics");
+//        });
 
-                        if (coreDistance(point, pointNeighbors) > 0){
-                            List<Particle> seeds = new ArrayList<>();
-                            update(pointNeighbors, point, seeds);
-
-                            while(seeds.size() > 0) {
-                                Collections.sort(seeds, new RDComparator());
-                                try{
-                                    Particle n = seeds.get(0);
-                                    seeds.remove(0);
-
-                                    processed(n, this.unprocessed.get(i), this.ordered.get(i));
-                                    List<Particle> nNeighbors = neighbors(n, this.subRois.get(i));
-
-                                    if (coreDistance(n, nNeighbors) > 0){
-                                        update(nNeighbors, n, seeds);
-                                    }
-                                }
-
-                                catch (IndexOutOfBoundsException ignored) {
-                                }
-
-                                opticsProgress.setValue(this.ordered.get(i).size());
-                                opticsProgress.setString("Processing ROI " + (i+1) + ": " + (int) (opticsProgress.getPercentComplete()*100) + "%");
-                                opticsProgress.repaint();
-                            }
-
-                        }
-
-                    }
-                    System.out.println("Counts: " + counts);
-                    opticsProgress.setString("Done!");
-                    DrCorrGUI.status.setText("OPTICS, so slow");
-
-                    cluster(15);
-
-                    try(PrintWriter write = new PrintWriter((this.currentDir.getParentFile() + "\\OPTICS_plot_" + i + ".txt"))){
-                        for (int j = 0; j < this.ordered.get(i).size(); j++){
-                            write.println(String.format(Locale.US, "%.1f %.1f %.2f %.0f", this.ordered.get(i).get(j).getX(),
-                                    this.ordered.get(i).get(j).getY(), this.ordered.get(i).get(j).opticsRD,
-                                    (float) this.ordered.get(i).get(j).opticsCluster));
-                        }
-                    } catch (FileNotFoundException e1){
-                        e1.printStackTrace();
-                    }
-
-                }
-            });
-
-            runOptics.start();
-
+        runOptics.start();
 
     }
 
@@ -308,8 +318,99 @@ public class OpticsClustering extends JFrame implements ActionListener{
                 System.out.println("done!");
 
                 break;
+
+            case "killOptics":
+                runOptics.interrupt();
+                System.out.println("SH");
+                executeOPTICS.setText("Run OPTICS");
+                executeOPTICS.setActionCommand("optics");
+                break;
         }
 
+    }
+
+    class OpticsThread extends Thread {
+
+        @Override
+        public void run() {
+
+            try{
+
+                executeOPTICS.setText("Stop OPTICS");
+                executeOPTICS.setActionCommand("killOptics");
+                for (int i= 0; i < unprocessed.size(); i++){
+                    opticsProgress.setMaximum(unprocessed.get(i).size());
+                    int counts = 0;
+                    while(unprocessed.get(i).size() > 0){
+                        Particle point = unprocessed.get(i).get(0);
+                        processed(point, unprocessed.get(i), ordered.get(i));
+
+                        List<Particle> pointNeighbors = neighbors(point, subRois.get(i));
+
+                        if (pointNeighbors.size() > 0) {
+//                    System.out.println("Neighbor size. " + pointNeighbors.size());
+                            counts += pointNeighbors.size();
+                        }
+
+
+                        if (coreDistance(point, pointNeighbors) > 0){
+                            List<Particle> seeds = new ArrayList<>();
+                            update(pointNeighbors, point, seeds);
+
+                            while(seeds.size() > 0) {
+                                Collections.sort(seeds, new RDComparator());
+                                try{
+                                    Particle n = seeds.get(0);
+                                    seeds.remove(0);
+
+                                    processed(n, unprocessed.get(i), ordered.get(i));
+                                    List<Particle> nNeighbors = neighbors(n, subRois.get(i));
+                                    this.sleep(1);
+
+                                    if (coreDistance(n, nNeighbors) > 0){
+                                        update(nNeighbors, n, seeds);
+                                    }
+
+                                }
+
+                                catch (IndexOutOfBoundsException ignored) {
+                                }
+
+                                opticsProgress.setValue(ordered.get(i).size());
+                                opticsProgress.setString("Processing ROI " + (i+1) + ": " + (int) (opticsProgress.getPercentComplete()*100) + "%");
+                                opticsProgress.repaint();
+                            }
+
+                        }
+
+//
+                    }
+                    System.out.println("Counts: " + counts);
+                    opticsProgress.setString("Done!");
+                    DrCorrGUI.status.setText("OPTICS, so slow");
+
+                    cluster(15);
+
+                    try(PrintWriter write = new PrintWriter((currentDir.getParentFile() + "\\OPTICS_plot_" + i + ".txt"))){
+                        for (int j = 0; j < ordered.get(i).size(); j++){
+                            write.println(String.format(Locale.US, "%.1f %.1f %.2f %.0f", ordered.get(i).get(j).getX(),
+                                    ordered.get(i).get(j).getY(), ordered.get(i).get(j).opticsRD,
+                                    (float) ordered.get(i).get(j).opticsCluster));
+                        }
+                    } catch (FileNotFoundException e1){
+                        e1.printStackTrace();
+                    }
+
+                }
+                executeOPTICS.setText("Run OPTICS");
+                executeOPTICS.setActionCommand("optics");
+            } catch (InterruptedException e) {
+                System.out.println("Interrupted");
+                opticsProgress.setString("OPTICS interrupted");
+                opticsProgress.setValue(0);
+            }
+
+        }
     }
 }
 
@@ -322,3 +423,4 @@ class RDComparator implements Comparator<Particle>{
         else return 1;
     }
 }
+
