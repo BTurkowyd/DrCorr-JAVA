@@ -68,13 +68,13 @@ class DrCorrGUI implements ActionListener {
         JFrame frame = new JFrame(Main.class.getSimpleName());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("Dogetor Corr");
-        ImageIcon icon = new ImageIcon(getClass().getResource("/doge.jpg"));
-        frame.setIconImage(icon.getImage());
-        JLabel logoLabel = new JLabel();
-        ImageIcon logo = new ImageIcon(getClass().getResource("/Doge.png"));
-        logoLabel.setIcon(new ImageIcon(logo.getImage()));
-        logoLabel.setBounds(new Rectangle(280, 140, 255, 306));
-        frame.add(logoLabel);
+        // ImageIcon icon = new ImageIcon(getClass().getResource("src/resource/doge.jpg"));
+        // frame.setIconImage(icon.getImage());
+        // JLabel logoLabel = new JLabel();
+        // ImageIcon logo = new ImageIcon(getClass().getResource("src/resource/Doge.png"));
+        // logoLabel.setIcon(new ImageIcon(logo.getImage()));
+        // logoLabel.setBounds(new Rectangle(280, 140, 255, 306));
+        // frame.add(logoLabel);
         /*
           Create buttons
          */

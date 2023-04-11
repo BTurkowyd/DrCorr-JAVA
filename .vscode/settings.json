@@ -1,0 +1,16 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.referencedLibraries": {
+        "include": [
+            "lib/**/*.jar",
+            "additionalLibraries/commons-math3-3.6.1/commons-math3-3.6.1.jar",
+            "additionalLibraries/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar",
+            "additionalLibraries/jcommon-1.0.24.jar"
+        ],
+        "exclude": [
+            "additionalLibraries/jfreechart-1.0.19/lib/jfreechart-1.0.19-swt.jar"
+        ]
+    }
+}
